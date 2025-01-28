@@ -23,7 +23,7 @@ const adapter: SimpleAdapter = {
   adapter: {
     [CHAIN.POLYGON]: {
       fetch: fetch,
-      start: 1693180800,
+      start: '2024-02-25',
     },
   },
   version: 2
