@@ -1,7 +1,6 @@
-import { time } from "console";
-import { SimpleAdapter } from "../../adapters/types";
+import { FetchOptions, SimpleAdapter } from "../../adapters/types";
 import { CHAIN } from "../../helpers/chains";
-import { getGraphDimensions } from "../../helpers/getUniSubgraph";
+import { getGraphDimensions2 } from "../../helpers/getUniSubgraph";
 
 const endpoints = {
   [CHAIN.ERA]: "https://api.studio.thegraph.com/query/60365/zksync-zkswap/v0.0.5"
@@ -13,30 +12,21 @@ const blacklistTokens = {
   ]
 }
 
-const graph = getGraphDimensions({
+const graph = getGraphDimensions2({
   graphUrls: endpoints,
   totalVolume: {
     factory: "uniswapFactories",
     field: "totalVolumeUSD",
   },
-  dailyVolume: {
-    factory: "uniswapDayData",
-    field: "dailyVolumeUSD",
-  },
   blacklistTokens
 });
 
 const adapters: SimpleAdapter = {
+  version: 2,
   adapter: {
     [CHAIN.ERA]: {
-      fetch: async (timestamp: number) => {
-        const data = await graph(CHAIN.ERA)(timestamp, {});
-        data.totalVolume = undefined;
-        return {
-          ...data
-        };
-      },
-      start: 1700524800,
+      fetch: graph(CHAIN.ERA),
+      start: '2023-11-21',
     }
   }
 }

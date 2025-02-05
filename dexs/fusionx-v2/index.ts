@@ -1,20 +1,16 @@
 import { SimpleAdapter } from "../../adapters/types";
 import { CHAIN } from "../../helpers/chains";
-import { DEFAULT_TOTAL_VOLUME_FIELD, getGraphDimensions } from "../../helpers/getUniSubgraph";
+import { DEFAULT_TOTAL_VOLUME_FIELD, getGraphDimensions2 } from "../../helpers/getUniSubgraph";
 
 const v2Endpoints = {
   [CHAIN.MANTLE]: "https://graphv3.fusionx.finance/subgraphs/name/fusionx/exchange"
 }
 
-const v2Graphs = getGraphDimensions({
+const v2Graphs = getGraphDimensions2({
   graphUrls: v2Endpoints,
   totalVolume: {
     factory: "fusionxFactories",
     field: DEFAULT_TOTAL_VOLUME_FIELD,
-  },
-  dailyVolume: {
-    factory: "fusionxDayData",
-    field: "dailyVolumeUSD",
   },
   feesPercent: {
     type: "volume",
@@ -28,10 +24,11 @@ const v2Graphs = getGraphDimensions({
 });
 
 const adapter: SimpleAdapter = {
+  version: 2,
   adapter: {
     [CHAIN.MANTLE]: {
       fetch: v2Graphs(CHAIN.MANTLE),
-      start: 1689206400,
+      start: '2023-07-13',
     },
   },
 };

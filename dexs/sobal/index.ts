@@ -1,5 +1,5 @@
-import { ChainEndpoints, BreakdownAdapter, BaseAdapter, SimpleAdapter } from "../../adapters/types";
-import { getChainVolume } from "../../helpers/getUniSubgraphVolume";
+import { ChainEndpoints, SimpleAdapter } from "../../adapters/types";
+import { getChainVolume2 } from "../../helpers/getUniSubgraphVolume";
 import { CHAIN } from "../../helpers/chains";
 import customBackfill from "../../helpers/customBackfill";
 import { Chain } from "@defillama/sdk/build/general";
@@ -14,24 +14,24 @@ const graphParams = {
     factory: "balancers",
     field: "totalSwapVolume",
   },
-  hasDailyVolume: false,
 }
 
-const graphs = getChainVolume({
+const graphs = getChainVolume2({
   graphUrls: endpoints,
   ...graphParams
 });
 
 const adapter: SimpleAdapter = {
+  version: 2,
   adapter: {
     [CHAIN.NEON]: {
       fetch: graphs(CHAIN.NEON),
-      start: 1689613200, // 17TH JULY 5PM GMT
+      start: '2023-07-17', // 17TH JULY 5PM GMT
       customBackfill: customBackfill(CHAIN.NEON as Chain, graphs),
     },
     [CHAIN.BASE]: {
       fetch: graphs(CHAIN.BASE),
-      start: 1690850000, // 1ST AUG 12:33 AM GMT
+      start: '2023-08-01', // 1ST AUG 12:33 AM GMT
       customBackfill: customBackfill(CHAIN.BASE as Chain, graphs),
     }
   }

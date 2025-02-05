@@ -1,5 +1,5 @@
 import { ChainEndpoints, BreakdownAdapter } from "../../adapters/types";
-import { getGraphDimensions } from "../../helpers/getUniSubgraph";
+import { getGraphDimensions2 } from "../../helpers/getUniSubgraph";
 import { CHAIN } from "../../helpers/chains";
 import { Chain } from "@defillama/sdk/build/general";
 import request, { gql } from "graphql-request";
@@ -37,20 +37,16 @@ const getCustomBlock = async (timestamp: number) => {
   return Number(block.blocks[0].number);
 };
 
-const graphs = getGraphDimensions({
+const graphs = getGraphDimensions2({
   graphUrls: endpoints,
   totalVolume: {
     factory: "uniswapFactories",
     field: "totalVolumeUSD",
   },
-  dailyVolume: {
-    factory: "uniswapDayData",
-    field: "dailyVolumeUSD",
-  },
   getCustomBlock
 });
 
-const v1graphs = getGraphDimensions({
+const v1graphs = getGraphDimensions2({
   graphUrls: {
     [CHAIN.KAVA]: "https://the-graph.kava.io/subgraphs/name/surfswap-stable-amm",
   },
@@ -58,26 +54,22 @@ const v1graphs = getGraphDimensions({
     factory: "tradeVolumes",
     field: "volume",
   },
-  dailyVolume: {
-    factory: "dailyVolume",
-    field: "volume",
-    dateField: "timestamp"
-  },
   getCustomBlock
 });
 
 const adapter: BreakdownAdapter = {
+  version: 2,
   breakdown: {
     classic: {
       [CHAIN.KAVA]: {
         fetch: graphs(CHAIN.KAVA as Chain),
-        start: 1659715200,
+        start: '2022-08-05',
       },
     },
     "stable-amm": {
       [CHAIN.KAVA]: {
         fetch: v1graphs(CHAIN.KAVA as Chain),
-        start: 1656547200,
+        start: '2022-06-30',
       },
     },
   }

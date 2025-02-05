@@ -1,8 +1,7 @@
 import { SimpleAdapter } from "../../adapters/types";
 import {
-  DEFAULT_DAILY_VOLUME_FIELD,
   DEFAULT_TOTAL_VOLUME_FIELD,
-  getGraphDimensions,
+  getGraphDimensions2,
 } from "../../helpers/getUniSubgraph";
 import { CHAIN } from "../../helpers/chains";
 import { Chain } from "@defillama/sdk/build/general";
@@ -39,48 +38,35 @@ const graphRequestHeaders:IMap = {
   [CHAIN.POLYGON]: defaultHeaders,
 };
 
+const startTimes = {
+  [CHAIN.ARBITRUM]: 1689582249,
+  [CHAIN.BASE]: 1691491872,
+  [CHAIN.BSC]: 1689581494,
+  [CHAIN.ETHEREUM]: 1678404995,
+  [CHAIN.POLYGON]: 1689582144,
+}
+
 /**
  * @note We are using this method that allow us to use http headers
  * The method `getGraphDimensions` try returns daily fees and total fees
  * but we are currently not using them in our subgraphs, so they are undefined
  */
-const graphs = getGraphDimensions({
+const graphs = getGraphDimensions2({
   graphUrls,
   graphRequestHeaders,
   totalVolume: {
     factory: "smardexFactories",
     field: DEFAULT_TOTAL_VOLUME_FIELD,
   },
-  dailyVolume: {
-    factory: "factoryDayData",
-    field: DEFAULT_DAILY_VOLUME_FIELD,
-    dateField: "date",
-  },
 });
 
-const adapter: SimpleAdapter = {
-  adapter: {
-    [CHAIN.ETHEREUM]: {
-      fetch: graphs(CHAIN.ETHEREUM),
-      start: 1678404995, // birthBlock timestamp
-    },
-    [CHAIN.BSC]: {
-      fetch: graphs(CHAIN.BSC),
-      start: 1689581494,
-    },
-    [CHAIN.POLYGON]: {
-      fetch: graphs(CHAIN.POLYGON),
-      start: 1689582144,
-    },
-    [CHAIN.ARBITRUM]: {
-      fetch: graphs(CHAIN.ARBITRUM),
-      start: 1689582249,
-    },
-    [CHAIN.BASE]: {
-      fetch: graphs(CHAIN.BASE),
-      start: 1691491872,
-    },
-  },
-};
+const adapter: SimpleAdapter = { adapter: {}, version: 2 }
+
+Object.keys(graphUrls).map((chain: string) => {
+  adapter.adapter[chain] = {
+    fetch: graphs(chain), 
+    start: startTimes[chain]
+  }
+})
 
 export default adapter;
