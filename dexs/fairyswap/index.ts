@@ -1,4 +1,4 @@
-import { DEFAULT_DAILY_VOLUME_FIELD, DEFAULT_TOTAL_VOLUME_FIELD, getChainVolume } from "../../helpers/getUniSubgraphVolume";
+import { DEFAULT_TOTAL_VOLUME_FIELD, getChainVolume2 } from "../../helpers/getUniSubgraphVolume";
 import { CHAIN } from "../../helpers/chains";
 import request, { gql } from "graphql-request";
 import { SimpleAdapter } from "../../adapters/types";
@@ -39,27 +39,21 @@ const getCustomBlock = async (timestamp: number) => {
   return block;
 };
 
-const DAILY_VOLUME_FACTORY = "fairyDayData";
-
-const graphs = getChainVolume({
+const graphs = getChainVolume2({
   graphUrls: endpoints,
   totalVolume: {
     factory: "fairyFactories",
     field: DEFAULT_TOTAL_VOLUME_FIELD,
   },
-  dailyVolume: {
-    factory: DAILY_VOLUME_FACTORY,
-    field: DEFAULT_DAILY_VOLUME_FIELD,
-    dateField: 'date'
-  },
   getCustomBlock,
 });
 
 const adapter: SimpleAdapter = {
+  version: 2,
   adapter: {
     [CHAIN.FINDORA]: {
       fetch: graphs(CHAIN.FINDORA),
-      start: 1647684000,
+      start: '2022-03-19',
     },
   },
 };

@@ -13,7 +13,7 @@ const fetch = async (timestamp: number): Promise<FetchResultVolume> => {
 	}
 	return {
 		dailyVolume: `${dailyVolume}`,
-		totalVolume: `${totalVolume}`,
+		// totalVolume: `${totalVolume}`,
 		timestamp
 	}
 };
@@ -23,7 +23,7 @@ const adapter: Adapter = {
 	adapter: {
 		[CHAIN.ICP]: {
 			fetch: fetch,
-			start: 1705363200,
+			start: '2024-01-16',
 		},
 	}
 };

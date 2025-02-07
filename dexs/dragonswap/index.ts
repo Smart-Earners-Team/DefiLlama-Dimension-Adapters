@@ -1,17 +1,15 @@
 import { Chain } from "@defillama/sdk/build/types";
 import { BaseAdapter, BreakdownAdapter, IJSON } from "../../adapters/types";
 import { CHAIN } from "../../helpers/chains";
-import { getGraphDimensions } from "../../helpers/getUniSubgraph";
+import { getGraphDimensions2 } from "../../helpers/getUniSubgraph";
 
 const endpoints = {
-  [CHAIN.KLAYTN]: "https://graph.dgswap.io/subgraphs/name/dragonswap/exchange-v2",
+  [CHAIN.KLAYTN]: "https://gateway.graph.dgswap.io/dgswap-exchange-v2-kaia",
 };
 
 const v3Endpoint = {
-  [CHAIN.KLAYTN]: "https://graph.dgswap.io/subgraphs/name/dragonswap/exchange-v3",
+  [CHAIN.KLAYTN]: "https://gateway.graph.dgswap.io/dgswap-exchange-v3-kaia",
 };
-
-const VOLUME_USD = "volumeUSD";
 
 const startTimes = {
   [CHAIN.KLAYTN]: 1707297572,
@@ -30,7 +28,7 @@ const methodology = {
   Fees: "All fees comes from the user."
 }
 
-const graphs = getGraphDimensions({
+const graphs = getGraphDimensions2({
   graphUrls: endpoints,
   graphRequestHeaders: {
     [CHAIN.KLAYTN]: {
@@ -39,9 +37,6 @@ const graphs = getGraphDimensions({
   },
   totalVolume: {
     factory: "pancakeFactories"
-  },
-  dailyVolume: {
-    factory: "pancakeDayData"
   },
   feesPercent: {
     type: "volume",
@@ -54,25 +49,18 @@ const graphs = getGraphDimensions({
   }
 });
 
-const v3Graph = getGraphDimensions({
+const v3Graph = getGraphDimensions2({
   graphUrls: v3Endpoint,
   totalVolume: {
     factory: "factories",
   },
-  dailyVolume: {
-    factory: "pancakeDayData",
-    field: VOLUME_USD
-  },
   totalFees: {
     factory: "factories",
-  },
-  dailyFees: {
-    factory: "pancakeDayData",
-    field: "feesUSD"
   },
 });
 
 const adapter: BreakdownAdapter = {
+  version: 2,
   breakdown: {
     v2: Object.keys(endpoints).reduce((acc, chain) => {
       acc[chain] = {
@@ -86,14 +74,7 @@ const adapter: BreakdownAdapter = {
     }, {} as BaseAdapter),
     v3: Object.keys(v3Endpoint).reduce((acc, chain) => {
       acc[chain] = {
-        fetch: async (timestamp: number) => {
-          const v3stats = await v3Graph(chain)(timestamp, {})
-          return {
-            ...v3stats,
-            timestamp
-          }
-  
-        },
+        fetch: v3Graph(chain),
         start: v3StartTimes[chain],
       }
       return acc

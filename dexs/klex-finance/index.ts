@@ -1,5 +1,5 @@
 import { ChainEndpoints, DISABLED_ADAPTER_KEY, SimpleAdapter } from "../../adapters/types";
-import { getChainVolume } from "../../helpers/getUniSubgraphVolume";
+import { getChainVolume2 } from "../../helpers/getUniSubgraphVolume";
 import customBackfill from "../../helpers/customBackfill";
 import { CHAIN } from "../../helpers/chains";
 import { Chain } from "@defillama/sdk/build/general";
@@ -15,16 +15,16 @@ const graphParams = {
     factory: "balancers",
     field: "totalSwapVolume",
   },
-  hasDailyVolume: false,
 }
 
 
-const graphs = getChainVolume({
+const graphs = getChainVolume2({
   graphUrls: endpoints,
   ...graphParams
 });
 
 const adapter: SimpleAdapter = {
+  version: 2,
   adapter: Object.keys(endpoints).reduce((acc, chain: any) => {
     return {
       ...acc,

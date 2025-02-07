@@ -1,5 +1,5 @@
 import { Chain } from "@defillama/sdk/build/general";
-import { Adapter, FetchResultFees } from "../../adapters/types";
+import { Adapter, FetchOptions, FetchResultFees } from "../../adapters/types";
 import { CHAIN } from "../../helpers/chains";
 import { queryDune } from "../../helpers/dune";
 import { getUniqStartOfTodayTimestamp } from "../../helpers/getUniSubgraphVolume";
@@ -12,8 +12,8 @@ interface IFee {
 }
 
 const fetch = (chain: Chain) => {
-  return async (timestamp: number): Promise<FetchResultFees> => {
-    const fees: IFee[] = (await queryDune(chain === CHAIN.ARBITRUM ? "3464532" : "3464559"))
+  return async (timestamp: number, _t: any, _: FetchOptions): Promise<FetchResultFees> => {
+    const fees: IFee[] = (await queryDune(chain === CHAIN.ARBITRUM ? "4385920" : "4385999"))
     // const queryId = chain === CHAIN.ARBITRUM ? "3186689" : "3186714";
     // const fees: IFee[] = (await fetchURLWithRetry(`https://api.dune.com/api/v1/query/${queryId}/results`)).result.rows;
     // const fees: IFee[] = require(`./${chain}.json`);
@@ -21,7 +21,7 @@ const fetch = (chain: Chain) => {
     const dateString = new Date(dayTimestamp * 1000).toISOString().split("T")[0];
     const daily = fees.find(fee => fee.time.split(' ')[0] === dateString);
     const dailyFees = daily?.v2_fees || 0
-    const total_fees = daily?.total_fees;
+    const total_fees = daily?.total_fees || 0;
     return {
       dailyFees: `${dailyFees}`,
       dailyRevenue: `${dailyFees * 0.37}`,
@@ -34,16 +34,15 @@ const fetch = (chain: Chain) => {
 };
 
 const adapter: Adapter = {
+  version: 1,
   adapter: {
     [CHAIN.ARBITRUM]: {
       fetch: fetch(CHAIN.ARBITRUM),
-      start: 1690848000,
-      runAtCurrTime: true,
+      start: '2023-08-01',
     },
     [CHAIN.AVAX]: {
       fetch: fetch(CHAIN.AVAX),
-      start: 1692835200,
-      runAtCurrTime: true,
+      start: '2023-08-24',
     },
   },
   isExpensiveAdapter: true,
